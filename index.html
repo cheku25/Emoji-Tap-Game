@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>🍕 Emoji Tap Challenge!</title>
+  <style>
+    /* CSS */
+    body {
+      font-family: 'Arial', sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      background: #f0f8ff;
+      margin: 0;
+      overflow: hidden;
+    }
+    #game-container {
+      text-align: center;
+    }
+    #emoji-box {
+      font-size: 100px;
+      margin: 30px;
+      user-select: none;
+      transition: transform 0.1s;
+    }
+    #score {
+      font-size: 24px;
+      margin: 20px;
+    }
+    #lives {
+      color: red;
+      font-size: 24px;
+    }
+    #start-btn {
+      padding: 10px 20px;
+      font-size: 18px;
+      background: #4CAF50;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    #start-btn:hover {
+      background: #45a049;
+    }
+    .tap-animation {
+      transform: scale(1.2);
+    }
+  </style>
+</head>
+<body>
+  <!-- HTML -->
+  <div id="game-container">
+    <h1>Tap the 🍕!</h1>
+    <div id="emoji-box">👋</div>
+    <div id="score">Score: 0</div>
+    <div id="lives">❤️❤️❤️</div>
+    <button id="start-btn">Start Game</button>
+  </div>
+
+  <!-- JavaScript -->
+  <script>
+    // Game variables
+    let score = 0;
+    let lives = 3;
+    let gameSpeed = 1000; // Start speed (ms)
+    let gameActive = false;
+    const targetEmoji = "🍕";
+    const emojis = ["😀", "🎃", "👽", "🎸", targetEmoji];
+    let emojiInterval;
+
+    // DOM elements
+    const emojiBox = document.getElementById("emoji-box");
+    const scoreDisplay = document.getElementById("score");
+    const livesDisplay = document.getElementById("lives");
+    const startBtn = document.getElementById("start-btn");
+
+    // Start game
+    startBtn.addEventListener("click", startGame);
+
+    // Tap logic
+    emojiBox.addEventListener("click", () => {
+      if (!gameActive) return;
+      
+      if (emojiBox.textContent === targetEmoji) {
+        // Correct tap
+        score++;
+        scoreDisplay.textContent = `Score: ${score}`;
+        emojiBox.classList.add("tap-animation");
+        setTimeout(() => emojiBox.classList.remove("tap-animation"), 200);
+        
+        // Increase speed every 5 points
+        if (score % 5 === 0) {
+          gameSpeed = Math.max(300, gameSpeed - 100);
+          clearInterval(emojiInterval);
+          emojiInterval = setInterval(flashEmoji, gameSpeed);
+        }
+      } else {
+        // Wrong tap
+        loseLife();
+      }
+    });
+
+    // Game functions
+    function flashEmoji() {
+      const randomEmoji = emojis[Math.floor(Math.random() * emojis.length)];
+      emojiBox.textContent = randomEmoji;
+    }
+
+    function loseLife() {
+      lives--;
+      livesDisplay.textContent = "❤️".repeat(lives);
+      
+      if (lives <= 0) {
+        endGame();
+      }
+    }
+
+    function startGame() {
+      score = 0;
+      lives = 3;
+      gameSpeed = 1000;
+      gameActive = true;
+      scoreDisplay.textContent = `Score: ${score}`;
+      livesDisplay.textContent = "❤️".repeat(lives);
+      startBtn.style.display = "none";
+      emojiInterval = setInterval(flashEmoji, gameSpeed);
+    }
+
+    function endGame() {
+      gameActive = false;
+      clearInterval(emojiInterval);
+      emojiBox.textContent = "💀";
+      startBtn.style.display = "block";
+      startBtn.textContent = "Play Again";
+      alert(`Game Over! Final Score: ${score}`);
+    }
+  </script>
+</body>
+</html>
